@@ -1,10 +1,16 @@
 package nl.craftsmen.brewery.job.controller;
 
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Scope;
 import nl.craftsmen.brewery.job.model.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,8 +29,10 @@ public class JobController {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobController.class);
 
     private final JobService jobService;
+    private final Tracer tracer;
 
-    public JobController(JobService jobService) {
+    public JobController(OpenTelemetry openTelemetry, JobService jobService) {
+        this.tracer = openTelemetry.getTracer(getClass().getName(), "0.1.0");
         this.jobService = jobService;
     }
 
@@ -32,12 +40,24 @@ public class JobController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<Job>> listJobs() {
         LOGGER.debug("List jobs");
-        List<Job> jobs = jobService.findAll();
-        if (jobs.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            return ResponseEntity.ok(jobs);
+
+        // Exercise 5 - Create your own span
+        // TODO: add your own span
+        Span span = tracer.spanBuilder("list jobs").startSpan();
+
+        try (Scope scope = span.makeCurrent()) {
+            List<Job> jobs = jobService.findAll();
+            if (jobs.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            } else {
+                return ResponseEntity.ok(jobs);
+            }
+        } catch (Throwable t) {
+            span.recordException(t);
+        } finally {
+            span.end();
         }
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @GetMapping(value = "/job/{id}", produces = "application/json")
