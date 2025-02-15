@@ -1,5 +1,8 @@
 package nl.craftsmen.brewery.job.controller;
 
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Scope;
 import nl.craftsmen.brewery.job.company.CompanyService;
 import nl.craftsmen.brewery.job.company.Developer;
 import nl.craftsmen.brewery.job.model.Job;
@@ -23,14 +26,23 @@ public class JobService {
     private final ProjectService projectService;
     private final CompanyService companyService;
 
-    public JobService(JobRepository jobRepository, ProjectService projectService, CompanyService companyService) {
+    private final Tracer tracer;
+
+    public JobService(JobRepository jobRepository, ProjectService projectService, CompanyService companyService, Tracer tracer) {
         this.jobRepository = jobRepository;
         this.projectService = projectService;
         this.companyService = companyService;
+        this.tracer = tracer;
     }
 
     public List<Job> findAll() {
-        return jobRepository.findAll().stream().peek(this::updateJobWithProjectAndDeveloper).collect(Collectors.toList());
+        // Exercise 6 - create a child span
+        Span span = tracer.spanBuilder("find all jobs").startSpan();
+        try (Scope scope = span.makeCurrent()) {
+            return jobRepository.findAll().stream().peek(this::updateJobWithProjectAndDeveloper).collect(Collectors.toList());
+        } finally {
+            span.end();
+        }
     }
 
     public Optional<Job> findById(Integer id) {
