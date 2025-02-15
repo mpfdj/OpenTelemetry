@@ -1,0 +1,9 @@
+@startuml
+Job -- Developer
+Job -- Project
+Project -- Skill
+Developer -- Skill
+Developer -- Company
+
+@enduml
+

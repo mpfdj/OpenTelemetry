@@ -1,0 +1,10 @@
+PUT http://localhost:8080/company/2
+Content-Type: application/json
+
+{
+  "name" : "TechForce1",
+  "address" : "De Regenboog 51",
+  "city" : "Nieuwkoop",
+  "telephone" : "0612345678"
+}
+

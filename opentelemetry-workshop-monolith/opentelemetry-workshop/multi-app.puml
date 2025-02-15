@@ -1,0 +1,20 @@
+@startuml
+[Job (Spring Boot)] --> [Company (Quarkus)]
+[Job (Spring Boot)] --> [Project (Spring Boot)]
+
+[Company (Quarkus)] --> [Company DB]
+[Project (Spring Boot)] --> [Project DB]
+[Job (Spring Boot)] --> [Job DB]
+
+database "Company DB" {
+    [Company ] -- [Developer]
+    [Developer] -- [Skill]
+}
+database "Project DB" {
+    [Project] -- [Skill ]
+}
+
+database "Job DB" {
+    [Job ]
+}
+@enduml

@@ -1,0 +1,9 @@
+POST http://localhost:8082/company/new
+Content-Type: application/json
+
+{
+  "name" : "New company",
+  "address" : "new address",
+  "city" : "Amsterdam",
+  "telephone" : "0676543210"
+}

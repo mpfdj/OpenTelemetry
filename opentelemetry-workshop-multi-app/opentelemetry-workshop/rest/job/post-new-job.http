@@ -1,0 +1,10 @@
+POST http://localhost:8080/job/new
+Content-Type: application/json
+
+{
+  "startDate" : "2023-11-01",
+  "description": "Kotlin developer bij de NS",
+  "projectName" : "Developer NS",
+  "developerFirstName": "Exciting",
+  "developerLastName": "Engineer"
+}

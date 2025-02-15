@@ -1,0 +1,10 @@
+POST http://localhost:8081/project/new
+Content-Type: application/json
+
+{
+  "name": "Developer ING",
+  "skills": [{
+    "name": "Java"
+  }]
+
+}
