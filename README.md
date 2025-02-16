@@ -37,3 +37,14 @@ To override the defaults you can use application.properties.
 https://opentelemetry.io/docs/zero-code/java/spring-boot-starter/out-of-the-box-instrumentation/
 https://signoz.io/blog/opentelemetry-spring-boot/
 https://medium.com/@yangli136/how-opentelemetry-is-integrated-with-spring-boot-application-7e309efc0011
+
+
+# Units of work
+- trace 
+  - span
+    - attribute
+    - event
+    - baggage
+
+
+# TODO: Purge SigNoz database
