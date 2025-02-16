@@ -1,5 +1,7 @@
 package nl.craftsmen.brewery.company.controller;
 
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.context.Scope;
 import io.opentelemetry.instrumentation.annotations.SpanAttribute;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
@@ -104,7 +106,16 @@ public class CompanyController {
     @WithSpan("find developer by name")  // Exercise 7 - Create a remote span
     // Exercise 8 - Add attributes to the spans
     public Response getDeveloperByName(@SpanAttribute("lastname") @PathParam("lastname") String lastname, @SpanAttribute("firstname") @PathParam("firstname") String firstname) {
-        Optional<Developer> developer = companyService.findDeveloperByName(lastname, firstname);
-        return developer.map(d -> Response.ok(d).build()).orElse(Response.status(NOT_FOUND).build());
+
+        // Quarkus @WithSpan Missing Span
+        // https://stackoverflow.com/questions/77254075/quarkus-opentelemetry-http-span-names
+        Span span = Span.current();
+        try(Scope scope = span.makeCurrent()) {
+            Optional<Developer> developer = companyService.findDeveloperByName(lastname, firstname);
+            return developer.map(d -> Response.ok(d).build()).orElse(Response.status(NOT_FOUND).build());
+        }
+
+
+
     }
 }
