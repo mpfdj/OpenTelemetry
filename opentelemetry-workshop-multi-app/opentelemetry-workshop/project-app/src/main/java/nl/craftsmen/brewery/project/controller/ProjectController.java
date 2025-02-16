@@ -48,6 +48,7 @@ public class ProjectController {
     public ResponseEntity<Project> getProject(@PathVariable("name") String name) {
         LOGGER.debug("Get project by name '{}'", name);
         Span span = tracer.spanBuilder("find project by name").startSpan();
+        span.setAttribute("name", name);  // Exercise 8 - Add attributes to the spans
         try (Scope scope = span.makeCurrent()){
             Optional<Project> project = projectService.findProjectByName(name);
             return project
