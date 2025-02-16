@@ -1,5 +1,6 @@
 package nl.craftsmen.brewery.company.controller;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -99,6 +100,7 @@ public class CompanyController {
     @Path("/developer/{lastname}/{firstname}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @WithSpan("find developer by name")  // Exercise 7 - Create a remote span
     public Response getDeveloperByName(@PathParam("lastname") String lastname, @PathParam("firstname") String firstname) {
         Optional<Developer> developer = companyService.findDeveloperByName(lastname, firstname);
         return developer.map(d -> Response.ok(d).build()).orElse(Response.status(NOT_FOUND).build());

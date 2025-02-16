@@ -1,5 +1,9 @@
 package nl.craftsmen.brewery.project.controller;
 
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Scope;
 import nl.craftsmen.brewery.project.model.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +25,11 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
-    public ProjectController(ProjectService projectService) {
+    private final Tracer tracer;
+
+    public ProjectController(ProjectService projectService, OpenTelemetry openTelemetry) {
         this.projectService = projectService;
+        this.tracer = openTelemetry.getTracer(getClass().getName(), "0.1.0");
     }
 
     @GetMapping(value = "/projects", produces = "application/json")
@@ -35,13 +42,20 @@ public class ProjectController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+
+    // Exercise 7 - Create a remote span
     @GetMapping(value = "/project/{name}", produces = "application/json")
-    public ResponseEntity<Project> getProject(@PathVariable String name) {
+    public ResponseEntity<Project> getProject(@PathVariable("name") String name) {
         LOGGER.debug("Get project by name '{}'", name);
-        Optional<Project> project = projectService.findProjectByName(name);
-        return project
-                .map(ResponseEntity::ok)
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        Span span = tracer.spanBuilder("find project by name").startSpan();
+        try (Scope scope = span.makeCurrent()){
+            Optional<Project> project = projectService.findProjectByName(name);
+            return project
+                    .map(ResponseEntity::ok)
+                    .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        } finally {
+            span.end();
+        }
     }
 
     @PostMapping(value = "project/new", produces = "application/json", consumes = "application/json")
