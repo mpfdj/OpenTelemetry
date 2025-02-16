@@ -29,6 +29,7 @@ public class JobController {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobController.class);
 
     private final JobService jobService;
+
     private final Tracer tracer;
 
     public JobController(OpenTelemetry openTelemetry, JobService jobService) {
@@ -48,13 +49,16 @@ public class JobController {
         try (Scope scope = span.makeCurrent()) {
             List<Job> jobs = jobService.findAll();
             if (jobs.isEmpty()) {
+                span.addEvent("Jobs not found");  // Exercise 9 - Add events
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             } else {
+                span.addEvent("Jobs found");  // Exercise 9 - Add events
                 return ResponseEntity.ok(jobs);
             }
         } catch (Throwable t) {
             span.recordException(t);
         } finally {
+            span.addEvent("JobController span ended"); // Exercise 9 - Add events
             span.end();
         }
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

@@ -1,5 +1,8 @@
 package nl.craftsmen.brewery.company.controller;
 
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.trace.Span;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -20,6 +23,11 @@ public class CompanyService {
 
     @Inject
     DeveloperRepository developerRepository;
+
+
+    // Exercise 9 - Add events
+    @Inject
+    Span span;
 
     public List<Company> findAll() {
         LOGGER.debug("Find all companies");
@@ -65,6 +73,8 @@ public class CompanyService {
 
     public Optional<Developer> findDeveloperByName(String lastname, String firstname) {
         LOGGER.debug("find developer by name " + firstname + " " + lastname);
+        // Exercise 9 - Add events
+        span.addEvent("developer name", Attributes.of(AttributeKey.stringKey("name"), firstname + " " + lastname));
         return developerRepository.findDeveloperByName(lastname, firstname);
     }
 }

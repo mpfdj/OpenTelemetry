@@ -1,6 +1,8 @@
 package nl.craftsmen.brewery.project.controller;
 
 import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Scope;
@@ -50,6 +52,7 @@ public class ProjectController {
         Span span = tracer.spanBuilder("find project by name").startSpan();
         span.setAttribute("name", name);  // Exercise 8 - Add attributes to the spans
         try (Scope scope = span.makeCurrent()){
+            span.addEvent("Calling projectService", Attributes.of(AttributeKey.stringKey("name"), name));  // Exercise 9 - Add events
             Optional<Project> project = projectService.findProjectByName(name);
             return project
                     .map(ResponseEntity::ok)
