@@ -83,9 +83,9 @@ clickhouse-client -q "SHOW TABLES FROM signoz_logs;"
 
 
 # Generate sql purge scripts
-clickhouse-client -q "SHOW TABLES FROM signoz_traces;" | xargs --max-lines=1 -I {} echo "TRUNCATE TABLE signoz_traces.{};" | tee /tmp/purge_signoz_traces.sql
-clickhouse-client -q "SHOW TABLES FROM signoz_metrics;" | xargs --max-lines=1 -I {} echo "TRUNCATE TABLE signoz_metrics.{};" | tee /tmp/purge_signoz_metrics.sql
-clickhouse-client -q "SHOW TABLES FROM signoz_logs;" | xargs --max-lines=1 -I {} echo "TRUNCATE TABLE signoz_logs.{};" | tee /tmp/purge_signoz_logs.sql
+clickhouse-client -q "SHOW TABLES FROM signoz_traces;" | xargs -i echo "TRUNCATE TABLE signoz_traces.{};" | tee /tmp/purge_signoz_traces.sql
+clickhouse-client -q "SHOW TABLES FROM signoz_metrics;" | xargs -i echo "TRUNCATE TABLE signoz_metrics.{};" | tee /tmp/purge_signoz_metrics.sql
+clickhouse-client -q "SHOW TABLES FROM signoz_logs;" | xargs -i echo "TRUNCATE TABLE signoz_logs.{};" | tee /tmp/purge_signoz_logs.sql
 
 
 # Run sql purge scripts
