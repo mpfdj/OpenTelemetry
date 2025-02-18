@@ -1,5 +1,6 @@
 package nl.craftsmen.brewery.company.controller;
 
+import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.Span;
@@ -28,6 +29,10 @@ public class CompanyService {
     // Exercise 9 - Add events
     @Inject
     Span span;
+
+    // Exercise 10 - Adding baggage
+    @Inject
+    Baggage baggage;
 
     public List<Company> findAll() {
         LOGGER.debug("Find all companies");
@@ -73,8 +78,12 @@ public class CompanyService {
 
     public Optional<Developer> findDeveloperByName(String lastname, String firstname) {
         LOGGER.debug("find developer by name " + firstname + " " + lastname);
+
         // Exercise 9 - Add events
         span.addEvent("developer name", Attributes.of(AttributeKey.stringKey("name"), firstname + " " + lastname));
+
+        // Exercise 10 - Adding baggage
+        span.setAttribute("userid", Optional.ofNullable(baggage.getEntryValue("userid")).orElse("not found"));
         return developerRepository.findDeveloperByName(lastname, firstname);
     }
 }

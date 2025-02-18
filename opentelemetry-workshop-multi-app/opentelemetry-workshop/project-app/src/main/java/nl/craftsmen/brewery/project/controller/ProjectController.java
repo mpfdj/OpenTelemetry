@@ -1,6 +1,7 @@
 package nl.craftsmen.brewery.project.controller;
 
 import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.Span;
@@ -51,6 +52,10 @@ public class ProjectController {
         LOGGER.debug("Get project by name '{}'", name);
         Span span = tracer.spanBuilder("find project by name").startSpan();
         span.setAttribute("name", name);  // Exercise 8 - Add attributes to the spans
+
+        String userid = Baggage.current().getEntryValue("userid");  // Exercise 10 - Adding baggage
+        span.setAttribute("userid", userid);  // Exercise 10 - Adding baggage
+
         try (Scope scope = span.makeCurrent()){
             span.addEvent("Calling projectService", Attributes.of(AttributeKey.stringKey("name"), name));  // Exercise 9 - Add events
             Optional<Project> project = projectService.findProjectByName(name);
